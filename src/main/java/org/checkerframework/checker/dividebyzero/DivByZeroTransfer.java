@@ -96,10 +96,6 @@ public class DivByZeroTransfer extends CFTransfer {
         if (equal(lhs, zero) && equal(rhs, zero)) {
           return bottom;
         }
-        else {
-          return top;
-        }
-
       
       case LT:
         if (equal(lhs, zero) && equal(rhs, zero)) {
