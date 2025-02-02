@@ -40,7 +40,7 @@ public class DivByZeroVisitor extends BaseTypeVisitor<DivByZeroAnnotatedTypeFact
     // check children of the node
     Tree RightOperand = node.getRightOperand();
       if (RightOperand != null) {
-        if (hasAnnotation(RightOperand, Zero.class) || hasAnnotation(RightOperand, Top.class)) {
+        if (hasAnnotation(RightOperand, Zero.class) || hasAnnotation(RightOperand, Top.class) || hasAnnotation(RightOperand, Bottom.class)) {
           return true;
       }
     }
@@ -69,7 +69,7 @@ public class DivByZeroVisitor extends BaseTypeVisitor<DivByZeroAnnotatedTypeFact
     // check children of the node
     Tree RightOperand = node.getExpression();
     if (RightOperand != null) {
-      if (hasAnnotation(RightOperand, Zero.class) || hasAnnotation(RightOperand, Top.class)) {
+      if (hasAnnotation(RightOperand, Zero.class) || hasAnnotation(RightOperand, Top.class) || hasAnnotation(RightOperand, Bottom.class)) {
         return true;
       }
     }

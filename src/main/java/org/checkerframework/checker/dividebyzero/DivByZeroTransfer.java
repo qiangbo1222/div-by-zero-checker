@@ -80,7 +80,8 @@ public class DivByZeroTransfer extends CFTransfer {
     AnnotationMirror bottom = bottom();
     AnnotationMirror top = top();
     AnnotationMirror zero = reflect(Zero.class);
-    AnnotationMirror nonZero = reflect(NonZero.class);
+    AnnotationMirror positive = reflect(Positive.class);
+    AnnotationMirror negative = reflect(Negative.class);
 
     // filter out any bottom cases
     if (equal(lhs, bottom) || equal(rhs, bottom)) {
@@ -95,40 +96,54 @@ public class DivByZeroTransfer extends CFTransfer {
         if (equal(lhs, zero) && equal(rhs, zero)) {
           return bottom;
         }
-        else if (equal(lhs, zero)) {
-          return nonZero;
-        }
-        else if (equal(rhs, zero)) {
-          return nonZero;
-        }
         else {
-          return glb(lhs, rhs);
+          return top;
         }
+
       
       case LT:
+        if (equal(lhs, zero) && equal(rhs, zero)) {
+          return bottom;
+        }
+        else if (equal(rhs, zero) || equal(rhs, positive)) {
+          return positive;
+        }
+        else {
+          return lhs;
+        }
       case GT:
         if (equal(lhs, zero) && equal(rhs, zero)) {
           return bottom;
         }
-        else if (equal(rhs, zero)) {
-          return nonZero;
+        else if (equal(rhs, zero) || equal(rhs, negative)) {
+          return negative;
         }
         else {
           return lhs;
         }
       
       case LE:
-      case GE:
         if (equal(lhs, zero) && equal(rhs, zero)) {
           return bottom;
+        }
+        else if (equal(rhs, positive)) {
+          return positive;
         }
         else {
           return lhs;
         }
+      case GE:
+        if (equal(lhs, zero) && equal(rhs, zero)) {
+          return bottom;
+        }
+        else if (equal(rhs, negative)) {
+          return negative;
+        }
+        else {
+          return lhs;
+        }
+
     }
-      
-
-
     return lhs;
   }
 
@@ -154,7 +169,8 @@ public class DivByZeroTransfer extends CFTransfer {
     AnnotationMirror bottom = bottom();
     AnnotationMirror top = top();
     AnnotationMirror zero = reflect(Zero.class);
-    AnnotationMirror nonZero = reflect(NonZero.class);
+    AnnotationMirror positive = reflect(Positive.class);
+    AnnotationMirror negative = reflect(Negative.class);
 
     // filter out any bottom cases
     if (equal(lhs, bottom) || equal(rhs, bottom)) {
@@ -163,40 +179,123 @@ public class DivByZeroTransfer extends CFTransfer {
 
     switch(operator) {
       case PLUS:
-      case MINUS:
         if (equal(lhs, zero) && equal(rhs, zero)) {
           return zero;
         }
         else if (equal(lhs, zero)) {
-          return rhs;
+          if (equal(rhs, positive)) {
+            return positive;
+          }
+          else if (equal(rhs, negative)) {
+            return negative;
+          }
+          else {
+            return top;
+          }
         }
         else if (equal(rhs, zero)) {
-          return lhs;
+          if (equal(lhs, positive)) {
+            return positive;
+          }
+          else if (equal(lhs, negative)) {
+            return negative;
+          }
+          else {
+            return top;
+          }
+        }
+        else if (equal(lhs, positive) && equal(rhs, positive)) {
+          return positive;
+        }
+        else if (equal(lhs, negative) && equal(rhs, negative)) {
+          return negative;
         }
         else {
           return top;
         }
       
+
+      case MINUS:
+        if (equal(lhs, zero) && equal(rhs, zero)) {
+          return zero;
+        }
+        else if (equal(lhs, zero)) {
+          if (equal(rhs, positive)) {
+            return negative;
+          }
+          else if (equal(rhs, negative)) {
+            return positive;
+          }
+          else {
+            return top;
+          }
+        }
+        else if (equal(rhs, zero)) {
+          if (equal(lhs, positive)) {
+            return positive;
+          }
+          else if (equal(lhs, negative)) {
+            return negative;
+          }
+          else {
+            return top;
+          }
+        }
+        else if (equal(lhs, positive) && equal(rhs, negative)) {
+          return positive;
+        }
+        else if (equal(lhs, negative) && equal(rhs, positive)) {
+          return negative;
+        }
+        else {
+          return top;
+        }
+        
+      
       case TIMES:
         if (equal(lhs, zero) || equal(rhs, zero)) {
           return zero;
         }
-        else {
-          return nonZero;
+        else if (equal(lhs, top) || equal(rhs, top)) {
+          return top;
         }
+        else if (equal(lhs, positive) && equal(rhs, positive)) {
+          return positive;
+        }
+        else if (equal(lhs, negative) && equal(rhs, negative)) {
+          return positive;
+        }
+        else if (equal(lhs, positive) && equal(rhs, negative)) {
+          return negative;
+        }
+        else if (equal(lhs, negative) && equal(rhs, positive)) {
+          return negative;
+        }
+        else {
+          return top;
+        }
+        
       
       case DIVIDE:
         if (equal(lhs, zero) && equal(rhs, zero)) {
           return bottom;
         }
+        else if (equal(lhs, zero)) {
+          if (equal(rhs, positive)) {
+            return zero;
+          }
+          else if (equal(rhs, negative)) {
+            return zero;
+          }
+          else {
+            return bottom;
+          }
+        }
         else if (equal(rhs, zero)) {
           return bottom;
         }
-        else if (equal(lhs, zero)) {
-          return zero;
-        }
         else {
-          return nonZero;
+          return top;
         }
       
       
